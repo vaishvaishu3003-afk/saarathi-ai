@@ -1,5 +1,6 @@
 import streamlit as st
 from ai_logic import sarathi_ai
+from PyPDF2 import PdfReader
 
 # ---------------------------
 # Page Config
@@ -35,7 +36,9 @@ Get guidance for:
         "warn": "Please enter a question.",
         "success": "Guidance Generated Successfully!",
         "response": "📋 AI Response",
-        "footer": "Built for Hackathon Demo"
+        "footer": "Built for Hackathon Demo",
+        "lang_info_en": "🟢 AI is responding in English mode",
+        "pdf_success": "📄 PDF loaded successfully!"
     },
     "te": {
         "title": "🧭 సారథి AI",
@@ -58,7 +61,9 @@ Get guidance for:
         "warn": "దయచేసి ప్రశ్న ఇవ్వండి.",
         "success": "గైడెన్స్ విజయవంతంగా తయారైంది!",
         "response": "📋 సమాధానం",
-        "footer": "హ్యాకథాన్ డెమో కోసం రూపొందించబడింది"
+        "footer": "హ్యాకథాన్ డెమో కోసం రూపొందించబడింది",
+        "lang_info_te": "🟢 AI తెలుగు మోడ్‌లో స్పందిస్తుంది",
+        "pdf_success": "📄 PDF విజయవంతంగా లోడ్ అయింది!"
     }
 }
 
@@ -81,10 +86,35 @@ st.markdown(f"""
 """)
 
 # ---------------------------
+# Language Mode Info
+# ---------------------------
+if lang == "te":
+    st.info(t["lang_info_te"])
+else:
+    st.info(t["lang_info_en"])
+
+# ---------------------------
 # Sidebar
 # ---------------------------
 st.sidebar.title(t["nav"])
 st.sidebar.info(t["sidebar_info"])
+
+# ---------------------------
+# 📄 STEP 5: PDF Upload Feature
+# ---------------------------
+uploaded_file = st.file_uploader("📄 Upload PDF Document", type=["pdf"])
+
+pdf_text = ""
+
+if uploaded_file is not None:
+    reader = PdfReader(uploaded_file)
+
+    for page in reader.pages:
+        text = page.extract_text()
+        if text:
+            pdf_text += text + "\n"
+
+    st.success(t["pdf_success"])
 
 # ---------------------------
 # Sample Questions
@@ -111,14 +141,18 @@ user_input = st.text_area(
 )
 
 # ---------------------------
-# Button Action
+# Button Action (STEP 5 UPDATED)
 # ---------------------------
 if st.button(t["button"]):
 
     if user_input.strip() == "":
         st.warning(t["warn"])
     else:
-        response = sarathi_ai(user_input)
+        # 📄 Combine PDF + user input
+        context = pdf_text if uploaded_file else ""
+
+        # 🧠 Pass language + document context to AI
+        response = sarathi_ai(user_input, lang, context)
 
         st.success(t["success"])
 
