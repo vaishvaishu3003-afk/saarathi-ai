@@ -1,6 +1,9 @@
 import streamlit as st
 from ai_logic import sarathi_ai
 from pypdf import PdfReader
+from gtts import gTTS
+import base64
+import os
 
 # ---------------------------
 # Page Config
@@ -65,9 +68,31 @@ Get guidance for:
         "actions": "📌 ముఖ్యమైన చర్యలు",
         "footer": "హ్యాకథాన్ డెమో కోసం రూపొందించబడింది",
         "lang_info_te": "🟢 AI తెలుగు మోడ్‌లో స్పందిస్తుంది",
-        "pdf_success": "📄 PDF విజయవంతంగా లోడ్ అయింది!"
+        "pdf_success": "📄 విజయవంతంగా లోడ్ అయింది!"
     }
 }
+
+# ---------------------------
+# 🎤 AUDIO FUNCTION (NEW)
+# ---------------------------
+def generate_voice(text, lang_code):
+    tts = gTTS(text=text, lang=lang_code)
+    audio_file = "voice.mp3"
+    tts.save(audio_file)
+    return audio_file
+
+
+def autoplay_audio(file_path):
+    with open(file_path, "rb") as f:
+        data = f.read()
+        b64 = base64.b64encode(data).decode()
+
+    audio_html = f"""
+    <audio autoplay controls>
+        <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+    </audio>
+    """
+    st.markdown(audio_html, unsafe_allow_html=True)
 
 # ---------------------------
 # Language Selector
@@ -102,7 +127,7 @@ st.sidebar.title(t["nav"])
 st.sidebar.info(t["sidebar_info"])
 
 # ---------------------------
-# 📄 STEP 5: PDF Upload Feature
+# 📄 PDF Upload Feature
 # ---------------------------
 uploaded_file = st.file_uploader("📄 Upload PDF Document", type=["pdf"])
 
@@ -156,16 +181,26 @@ if st.button(t["button"]):
         # Combine PDF + question
         context = pdf_text if uploaded_file else ""
 
-        # AI call (language + context)
+        # AI call
         response = sarathi_ai(user_input, lang, context)
 
         st.success(t["success"])
 
+        # ---------------------------
+        # 📋 RESPONSE
+        # ---------------------------
         st.markdown(f"## {t['response']}")
         st.write(response)
 
         # ---------------------------
-        # 🧩 STEP 8: ACTIONS TAB
+        # 🎤 VOICE OUTPUT (NEW FEATURE)
+        # ---------------------------
+        voice_lang = "te" if lang == "te" else "en"
+        audio_file = generate_voice(response, voice_lang)
+        autoplay_audio(audio_file)
+
+        # ---------------------------
+        # 🧩 ACTIONS SECTION
         # ---------------------------
         st.markdown("---")
         st.subheader(t["actions"])
@@ -186,7 +221,6 @@ Return:
 """
 
         actions_response = sarathi_ai(actions_prompt, lang, context)
-
         st.write(actions_response)
 
 # ---------------------------
