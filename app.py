@@ -3,6 +3,7 @@ from ai_logic import sarathi_ai
 from pypdf import PdfReader
 from gtts import gTTS
 import base64
+import uuid
 import os
 
 # ---------------------------
@@ -73,13 +74,13 @@ Get guidance for:
 }
 
 # ---------------------------
-# 🎤 AUDIO FUNCTION (NEW)
+# 🎤 AUDIO FUNCTIONS (SAFE VERSION)
 # ---------------------------
 def generate_voice(text, lang_code):
+    file_name = f"voice_{uuid.uuid4().hex}.mp3"
     tts = gTTS(text=text, lang=lang_code)
-    audio_file = "voice.mp3"
-    tts.save(audio_file)
-    return audio_file
+    tts.save(file_name)
+    return file_name
 
 
 def autoplay_audio(file_path):
@@ -101,7 +102,7 @@ lang = st.sidebar.selectbox("🌐 Language / భాష", ["en", "te"])
 t = LANG[lang]
 
 # ---------------------------
-# Title Section
+# UI
 # ---------------------------
 st.title(t["title"])
 st.subheader(t["subtitle"])
@@ -112,25 +113,18 @@ st.markdown(f"""
 {t["features"]}
 """)
 
-# ---------------------------
-# Language Mode Info
-# ---------------------------
 if lang == "te":
     st.info(t["lang_info_te"])
 else:
     st.info(t["lang_info_en"])
 
-# ---------------------------
-# Sidebar
-# ---------------------------
 st.sidebar.title(t["nav"])
 st.sidebar.info(t["sidebar_info"])
 
 # ---------------------------
-# 📄 PDF Upload Feature
+# PDF Upload
 # ---------------------------
 uploaded_file = st.file_uploader("📄 Upload PDF Document", type=["pdf"])
-
 pdf_text = ""
 
 if uploaded_file is not None:
@@ -147,7 +141,7 @@ if uploaded_file is not None:
         st.warning("⚠️ No readable text found in PDF.")
 
 # ---------------------------
-# Sample Questions
+# Input
 # ---------------------------
 sample_question = st.selectbox(
     t["sample"],
@@ -161,9 +155,6 @@ sample_question = st.selectbox(
     ]
 )
 
-# ---------------------------
-# Input Section
-# ---------------------------
 user_input = st.text_area(
     t["input"],
     value=sample_question,
@@ -171,42 +162,34 @@ user_input = st.text_area(
 )
 
 # ---------------------------
-# Button Action
+# ACTION
 # ---------------------------
 if st.button(t["button"]):
 
     if user_input.strip() == "":
         st.warning(t["warn"])
     else:
-        # Combine PDF + question
         context = pdf_text if uploaded_file else ""
 
-        # AI call
         response = sarathi_ai(user_input, lang, context)
 
         st.success(t["success"])
 
-        # ---------------------------
-        # 📋 RESPONSE
-        # ---------------------------
+        # Response
         st.markdown(f"## {t['response']}")
         st.write(response)
 
-        # ---------------------------
-        # 🎤 VOICE OUTPUT (NEW FEATURE)
-        # ---------------------------
+        # 🎤 Voice Output (SAFE)
         voice_lang = "te" if lang == "te" else "en"
         audio_file = generate_voice(response, voice_lang)
         autoplay_audio(audio_file)
 
-        # ---------------------------
-        # 🧩 ACTIONS SECTION
-        # ---------------------------
+        # 📌 Actions
         st.markdown("---")
         st.subheader(t["actions"])
 
         actions_prompt = f"""
-Extract important ACTIONS from this:
+Extract important ACTIONS:
 
 Document:
 {context}
@@ -217,7 +200,7 @@ User Question:
 Return:
 - To-do list
 - Deadlines
-- Required steps
+- Steps
 """
 
         actions_response = sarathi_ai(actions_prompt, lang, context)
