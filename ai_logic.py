@@ -1,102 +1,47 @@
-from gtts import gTTS
-import os
-
-# ---------------------------
-# 🧠 MAIN AI LOGIC
-# ---------------------------
 def sarathi_ai(query, lang="en", context=""):
     query = query.lower()
 
-    response = ""
-
-    # ------------------ PYTHON ------------------
     if "python" in query:
-        response = """
+        return """
 🐍 Python Developer Roadmap
 
 1. Learn Python fundamentals
 2. Practice OOP concepts
 3. Learn Git & GitHub
-4. Build mini projects
-5. Learn Flask/Streamlit
-6. Deploy projects online
+4. Build projects
+5. Learn frameworks
 """
 
-    # ------------------ PLACEMENT ------------------
     elif "placement" in query:
-        response = """
+        return """
 💼 Placement Preparation Plan
 
-1. Practice DSA daily
-2. Improve aptitude skills
-3. Build strong projects
-4. Create a professional resume
-5. Attend mock interviews
+1. Practice DSA
+2. Improve aptitude
+3. Build projects
+4. Resume preparation
 """
 
-    # ------------------ HACKATHON ------------------
     elif "hackathon" in query:
-        response = """
-🏆 Hackathon Success Guide
+        return """
+🏆 Hackathon Guide
 
-1. Identify a real-world problem
-2. Build an MVP first
-3. Focus on deployment
-4. Prepare a clear demo
-5. Explain impact and future scope
+1. Pick problem
+2. Build MVP
+3. Deploy fast
+4. Present clearly
 """
 
-    # ------------------ PDF / CONTEXT MODE ------------------
-    elif context:
-        response = f"""
-📄 Document-Based Answer
-
-Summary:
-{context[:500]}
-
-1. Read document carefully
-2. Extract key points
-3. Focus on deadlines
-4. Follow instructions step-by-step
-"""
-
-    # ------------------ DEFAULT ------------------
     else:
-        response = f"""
-🧭 Sarathi AI Guidance
+        return f"""
+🧭 Sarathi AI Response
 
 Topic: {query}
 
-1. Understand the fundamentals
-2. Create a learning roadmap
-3. Build practical projects
-4. Practice consistently
-5. Showcase your work
+Context: {context[:200] if context else "No document"}
 
-🚀 Success comes from continuous learning.
+1. Learn basics
+2. Practice daily
+3. Build projects
+4. Stay consistent
 """
-
-    # ---------------------------
-    # 🌍 LANGUAGE ADAPTATION (L10N)
-    # ---------------------------
-    if lang == "te":
-        response = response.replace("Learn", "నేర్చుకోండి")
-        response = response.replace("Practice", "అభ్యాసం చేయండి")
-
-    return response
-
-
-# ---------------------------
-# 🎤 VOICE FUNCTION (NEW)
-# ---------------------------
-def generate_voice(text, lang="en"):
-    """
-    Converts AI response to speech (English / Telugu)
-    """
-    try:
-        tts = gTTS(text=text, lang=lang)
-        file_path = "voice.mp3"
-        tts.save(file_path)
-        return file_path
-    except Exception as e:
-        return None
