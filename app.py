@@ -28,12 +28,13 @@ Get guidance for:
 """,
         "nav": "Navigation",
         "sidebar_info": "Sarathi AI helps students plan their learning journey.",
+        "language": "🌐 Language",
         "sample": "Choose a sample question",
         "input": "Ask Sarathi AI",
         "button": "🚀 Generate Guidance",
         "warn": "Please enter a question.",
-        "success": "Guidance Generated",
-        "response": "📋 Response",
+        "success": "Guidance Generated Successfully!",
+        "response": "📋 AI Response",
         "footer": "Built for Hackathon Demo"
     },
     "te": {
@@ -50,11 +51,12 @@ Get guidance for:
 """,
         "nav": "నావిగేషన్",
         "sidebar_info": "సారథి AI విద్యార్థుల కెరీర్ ప్లానింగ్‌లో సహాయపడుతుంది.",
+        "language": "🌐 భాష",
         "sample": "ఉదాహరణ ప్రశ్న ఎంచుకోండి",
         "input": "సారథి AIని అడగండి",
         "button": "🚀 గైడెన్స్ పొందండి",
         "warn": "దయచేసి ప్రశ్న ఇవ్వండి.",
-        "success": "గైడెన్స్ తయారైంది",
+        "success": "గైడెన్స్ విజయవంతంగా తయారైంది!",
         "response": "📋 సమాధానం",
         "footer": "హ్యాకథాన్ డెమో కోసం రూపొందించబడింది"
     }
@@ -63,7 +65,7 @@ Get guidance for:
 # ---------------------------
 # Language Selector
 # ---------------------------
-lang = st.sidebar.selectbox("🌐 Language", ["en", "te"])
+lang = st.sidebar.selectbox("🌐 Language / భాష", ["en", "te"])
 t = LANG[lang]
 
 # ---------------------------
