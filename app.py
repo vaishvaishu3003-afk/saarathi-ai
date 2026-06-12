@@ -1,6 +1,6 @@
 import streamlit as st
 from ai_logic import sarathi_ai
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 
 # ---------------------------
 # Page Config
@@ -36,6 +36,7 @@ Get guidance for:
         "warn": "Please enter a question.",
         "success": "Guidance Generated Successfully!",
         "response": "📋 AI Response",
+        "actions": "📌 Important Actions",
         "footer": "Built for Hackathon Demo",
         "lang_info_en": "🟢 AI is responding in English mode",
         "pdf_success": "📄 PDF loaded successfully!"
@@ -61,6 +62,7 @@ Get guidance for:
         "warn": "దయచేసి ప్రశ్న ఇవ్వండి.",
         "success": "గైడెన్స్ విజయవంతంగా తయారైంది!",
         "response": "📋 సమాధానం",
+        "actions": "📌 ముఖ్యమైన చర్యలు",
         "footer": "హ్యాకథాన్ డెమో కోసం రూపొందించబడింది",
         "lang_info_te": "🟢 AI తెలుగు మోడ్‌లో స్పందిస్తుంది",
         "pdf_success": "📄 PDF విజయవంతంగా లోడ్ అయింది!"
@@ -116,6 +118,9 @@ if uploaded_file is not None:
 
     st.success(t["pdf_success"])
 
+    if pdf_text.strip() == "":
+        st.warning("⚠️ No readable text found in PDF.")
+
 # ---------------------------
 # Sample Questions
 # ---------------------------
@@ -141,23 +146,48 @@ user_input = st.text_area(
 )
 
 # ---------------------------
-# Button Action (STEP 5 UPDATED)
+# Button Action
 # ---------------------------
 if st.button(t["button"]):
 
     if user_input.strip() == "":
         st.warning(t["warn"])
     else:
-        # 📄 Combine PDF + user input
+        # Combine PDF + question
         context = pdf_text if uploaded_file else ""
 
-        # 🧠 Pass language + document context to AI
+        # AI call (language + context)
         response = sarathi_ai(user_input, lang, context)
 
         st.success(t["success"])
 
         st.markdown(f"## {t['response']}")
         st.write(response)
+
+        # ---------------------------
+        # 🧩 STEP 8: ACTIONS TAB
+        # ---------------------------
+        st.markdown("---")
+        st.subheader(t["actions"])
+
+        actions_prompt = f"""
+Extract important ACTIONS from this:
+
+Document:
+{context}
+
+User Question:
+{user_input}
+
+Return:
+- To-do list
+- Deadlines
+- Required steps
+"""
+
+        actions_response = sarathi_ai(actions_prompt, lang, context)
+
+        st.write(actions_response)
 
 # ---------------------------
 # Footer
