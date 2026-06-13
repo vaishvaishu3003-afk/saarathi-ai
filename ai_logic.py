@@ -1,47 +1,49 @@
-def sarathi_ai(query, lang="en", context=""):
-    query = query.lower()
+import requests
 
-    if "python" in query:
-        return """
-🐍 Python Developer Roadmap
 
-1. Learn Python fundamentals
-2. Practice OOP concepts
-3. Learn Git & GitHub
-4. Build projects
-5. Learn frameworks
+def generate_summary(text, language):
+
+    prompt = f"""
+Respond ONLY in {language}.
+
+Create a short summary in 5 bullet points.
+
+DOCUMENT:
+{text[:3000]}
 """
 
-    elif "placement" in query:
-        return """
-💼 Placement Preparation Plan
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": "llama3",
+            "prompt": prompt,
+            "stream": False
+        }
+    )
 
-1. Practice DSA
-2. Improve aptitude
-3. Build projects
-4. Resume preparation
+    return response.json()["response"]
+
+
+def ask_question(document_text, question, language):
+
+    prompt = f"""
+Respond ONLY in {language}.
+
+Use the document below to answer the question.
+
+DOCUMENT:
+{document_text[:3000]}
+
+QUESTION:
+{question}
 """
 
-    elif "hackathon" in query:
-        return """
-🏆 Hackathon Guide
-
-1. Pick problem
-2. Build MVP
-3. Deploy fast
-4. Present clearly
-"""
-
-    else:
-        return f"""
-🧭 Sarathi AI Response
-
-Topic: {query}
-
-Context: {context[:200] if context else "No document"}
-
-1. Learn basics
-2. Practice daily
-3. Build projects
-4. Stay consistent
-"""
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": "llama3",
+            "prompt": prompt,
+            "stream": False
+        }
+    )
+    return response.json()["response"]
